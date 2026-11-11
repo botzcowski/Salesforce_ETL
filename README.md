@@ -66,7 +66,8 @@ Scripts that load the transformed data back into Salesforce.
 ├── sf_data_load.py                  # Script to upsert into Salesforce - for an object.
 ├── sf_data_delete_all.py            # Script to delete records inserted into Salesforce - for all object.
 ├── sf_data_delete.py                # Script to delete records inserted into Salesforce - for an object.
-├── sf_utility.py                    
+├── sf_utility.py
+├── mongodb_utility.py                    
 └── README.md
 ```
 
@@ -113,11 +114,19 @@ Create sub folders for intake, logs, outuput, and staging of files; e.g.: in, lo
 ## Config files 
 
 Salesforce related configurations, named as config_<organization>.json, example: config_causeway.json.
-max_day_range: the number of days back from the last extract run date to derive the lower-bound CDC date. 
-max_records_per_file: the number records to send to Salesforce for bulk API 2.0 operation (limit is 150 MB, and Salesforce will break into batches of 2,000).    
-transform_sf_system_fields: boolean, when true Salesforce object system fields are inserted with specified values, i.e.: Enable 'Create Audit Fields'  
-db: the name of the Mongo or MSSQL database name, leave blank when not inserting record into a staging database.
-target_objects: for each target object specify the source object and the related objects
+- max_day_range: the number of days back from the last extract run date to derive the lower-bound CDC date. 
+- max_records_per_file: the number records to send to Salesforce for bulk API 2.0 operation (limit is 150 MB, and Salesforce will break into batches of 2,000).    
+- transform_sf_system_fields: boolean, when true Salesforce object system fields are inserted with specified values, i.e.: Enable 'Create Audit Fields'  
+- db: the name of the Mongo or MSSQL database name, leave blank when not inserting record into a staging database.
+- target_objects: for each target object specify the source object and the related objects.
+
+MSSQL/MongoDB credentials, named as db_config_<organization>.json, example: db_config_causeway.json. Best practice is to store this information in environment variables. 
+
+Salesforce login credentials, named as login_<organization>.json, example: login_causeway.json. Best practice is to store this information in environment variables. 
+Create an External Client App, enable Client Credential Flow, generate Consumer Key and Secret.
+- consumer_key: the consumer key from the External Client App
+- consumer_secret: the secret from the External Client App
+- domain: the my domain name up to "my", example: "causeway--testing.sandbox.my", this is a workaround for simple_salesforce's lack of support for custom domains.
 
 ## Usage
 
