@@ -92,15 +92,6 @@ source .venv/bin/activate   # On Windows: .venv\Scripts\activate
 python3 -m pip install simple_salesforce salesforce_bulk pandas tabulate openpyxl pymongo sqlalchemy pyodbc
 ```
 
-Provide Salesforce credentials through environment variables or a local `.env` file (excluded via `.gitignore`):
-
-```
-SF_USERNAME=
-SF_PASSWORD=
-SF_SECURITY_TOKEN=
-SF_DOMAIN=login   # or "test" for sandbox
-```
-
 ## If staging of data in MSSQL is needed:
 
 Driver required on local machine:
@@ -113,24 +104,37 @@ Create sub folders for intake, logs, outuput, and staging of files; e.g.: in, lo
 
 ## Config files 
 
-Salesforce related configurations, named as config_<organization>.json, example: config_causeway.json.
+Salesforce related configurations, named as config_[organization].json, example: config_causeway.json.
 - max_day_range: the number of days back from the last extract run date to derive the lower-bound CDC date. 
 - max_records_per_file: the number records to send to Salesforce for bulk API 2.0 operation (limit is 150 MB, and Salesforce will break into batches of 2,000).    
 - transform_sf_system_fields: boolean, when true Salesforce object system fields are inserted with specified values, i.e.: Enable 'Create Audit Fields'  
 - db: the name of the Mongo or MSSQL database name, leave blank when not inserting record into a staging database.
-- target_objects: for each target object specify the source object and the related objects.
+- target_objects: the object name when the source data is to be transformed into another object. For each target object specify the source object, the related objects, and the field on the related object to lookup to the source object.
 
-MSSQL/MongoDB credentials, named as db_config_<organization>.json, example: db_config_causeway.json. Best practice is to store this information in environment variables. 
+MSSQL/MongoDB credentials, named as db_config_[organization].json, example: db_config_causeway.json. Best practice is to store this information in environment variables. 
 
-Salesforce login credentials, named as login_<organization>.json, example: login_causeway.json. Best practice is to store this information in environment variables. 
+Salesforce login credentials, named as login_[organization].json, example: login_causeway.json. Best practice is to store this information in environment variables. 
 Create an External Client App, enable Client Credential Flow, generate Consumer Key and Secret.
 - consumer_key: the consumer key from the External Client App
 - consumer_secret: the secret from the External Client App
 - domain: the my domain name up to "my", example: "causeway--testing.sandbox.my", this is a workaround for simple_salesforce's lack of support for custom domains.
 
 ## Usage
-
-Run each stage in order:
+- The sf_data_extract_all.py script looks for 2 files for each source object in the folder specified in the -objdir parameter
+    - file containing the last run date; file name = [source object api name]_last_run.txt, e.g.: account_last_run.txt 
+    - file containing the source object field api names to be extracted, delimited by comma or JSON string; file name = [source object api name].txt, e.g.: account.txt. When transforming a source object's data to a target object then the JSON string is configuration information to a field mapping file as in this example:
+    ```json
+     {
+       "format": "Excel",
+       "file": "Asset to Insurance Policy Mapping.xlsx",
+       "source_field_column_name": "Asset Field Name",
+       "target_field_column_name": "Policy Field Name",
+       "transformation_column_name": "Transformation"
+     }
+    ``` 
+- Determine if you will need to work with related objects, i.e. you need to re-link the child/lookup relationship after completing the ETL work for the source or source-to-target object. If yes, then modify the config_[organization].json accordingly.
+- The sf_data_extract.py executes the extraction for each object and places the csv file into the folder named in the -datadir parameter.
+- Insert the extract data into a database when there is a need to profile the data such as missing values or inconsistent value not specified in a pick list.  
 
 ```bash
 python extract/<extract_script>.py
