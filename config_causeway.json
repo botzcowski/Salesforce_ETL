@@ -1,0 +1,48 @@
+{
+    "max_day_range": 365,
+    "max_records_per_file": 200000,
+    "sf_api_version": "64.0",
+    "extract_add_sf_system_fields": false,
+    "transform_sf_system_fields": true,
+    "db": "",
+    "target_objects": [
+        {
+            "source_object": {"name": "asset"},
+            "target_object": {"name": "InsurancePolicy",
+                              "source_id_field": "Source_Asset_Id__c",   
+                              "related_objects": [
+                                    {
+                                        "related_object": "case",
+                                        "relationship_field": "Insurance_Policy__c",
+                                        "source_field": "AssetId"
+                                    },
+                                    {
+                                        "related_object": "task",
+                                        "relationship_field": "Insurance_Policy__c",
+                                        "source_field": "Policy__c"
+                                    },
+                                    {
+                                        "related_object": "event",
+                                        "relationship_field": "Insurance_Policy__c",
+                                        "source_field": "Policy__c"
+                                    }
+                                    {
+                                        "related_object": "endorsement__c",
+                                        "relationship_field": "Insurance_Policy__c",
+                                        "source_field": "Policy__c"
+                                    },
+                                    {
+                                        "related_object": "claim",
+                                        "relationship_field": "PolicyNumberId",
+                                        "source_field": "AssetId__c"
+                                    },
+                                    {
+                                        "related_object": "messagingsession",
+                                        "relationship_field": "Insurance_Policy__c",
+                                        "source_field": "Policy__c"
+                                    }                                    
+                              ]},            
+            "external_id_field": "Source_Asset_Id__c"
+        }
+    ]
+}
