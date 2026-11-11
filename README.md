@@ -110,6 +110,79 @@ Salesforce related configurations, named as config_[organization].json, example:
 - transform_sf_system_fields: boolean, when true Salesforce object system fields are inserted with specified values, i.e.: Enable 'Create Audit Fields'  
 - db: the name of the Mongo or MSSQL database name, leave blank when not inserting record into a staging database.
 - target_objects: the object name when the source data is to be transformed into another object. For each target object specify the source object, the related objects, and the field on the related object to lookup to the source object.
+- Example:
+
+    ```json
+    {
+        "max_day_range": 365,
+        "max_records_per_file": 200000,
+        "sf_api_version": "64.0",
+        "extract_add_sf_system_fields": false,
+        "transform_sf_system_fields": true,
+        "db": "",
+        "target_objects": [
+            {
+                "source_object": {"name": "asset"},
+                "target_object": {"name": "InsurancePolicy",
+                                  "source_id_field": "Source_Asset_Id__c",   
+                                  "related_objects": [
+                                        {
+                                            "related_object": "case",
+                                            "relationship_field": "Insurance_Policy__c",
+                                            "source_field": "AssetId"
+                                        },
+                                        {
+                                            "related_object": "task",
+                                            "relationship_field": "Insurance_Policy__c",
+                                            "source_field": "Policy__c"
+                                        },
+                                        {
+                                            "related_object": "event",
+                                            "relationship_field": "Insurance_Policy__c",
+                                            "source_field": "Policy__c"
+                                        },
+                                        {
+                                            "related_object": "claims_contact_staging__c",
+                                            "relationship_field": "Insurance_Policy__c",
+                                            "source_field": "Policy__c"
+                                        },
+                                        {
+                                            "related_object": "pcipal_transaction__c",
+                                            "relationship_field": "Insurance_Policy__c",
+                                            "source_field": "Policy__c"
+                                        },
+                                        {
+                                            "related_object": "sms_staging__c",
+                                            "relationship_field": "Insurance_Policy__c",
+                                            "source_field": "Policy__c"
+                                        },
+                                        {
+                                            "related_object": "endorsement__c",
+                                            "relationship_field": "Insurance_Policy__c",
+                                            "source_field": "Policy__c"
+                                        },
+                                        {
+                                            "related_object": "claim",
+                                            "relationship_field": "PolicyNumberId",
+                                            "source_field": "AssetId__c"
+                                        },
+                                        {
+                                            "related_object": "messagingsession",
+                                            "relationship_field": "Insurance_Policy__c",
+                                            "source_field": "Policy__c"
+                                        },
+                                        {
+                                            "related_object": "coi_details__c",
+                                            "relationship_field": "Insurance_Policy__c",
+                                            "source_field": "Policy__c"
+                                        }                                    
+                                  ]},            
+                "external_id_field": "Source_Asset_Id__c"
+            }
+        ]
+    }
+    
+    ```
 
 MSSQL/MongoDB credentials, named as db_config_[organization].json, example: db_config_causeway.json. Best practice is to store this information in environment variables. 
 
