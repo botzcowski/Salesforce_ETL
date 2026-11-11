@@ -52,12 +52,21 @@ Scripts that load the transformed data back into Salesforce.
 
 ```
 .
-├── extract/        # Extraction and staging scripts
-├── transform/      # Transformation scripts
-├── load/           # Salesforce upsert scripts
-├── staging/        # Staged data (not committed to version control)
-├── config/         # Configuration (field mappings, object settings)
-├── requirements.txt
+├── sf_data_extract_all.py           # Extraction script for all parent objects
+├── sf_data_extract.py               # Extraction script for each parent object
+├── sf_data_extract_related_all.py   # Optional; extraction script for all related objects
+├── sf_data_extract_related.py       # Optional; extraction script for each related object
+├── sf_data_transform_all.py         # Transformation script for all parent objects
+├── sf_data_transform.py             # Transformation script for each parent object
+├── sf_data_transform_related_all.py # Transformation script for all related objects
+├── sf_data_transform_related.py     # Transformation script for each related objects
+├── sf_data_transform_split_all.py   # Script to split a large csv file into smaller files for upsert into Salesforce - for all objects. 
+├── sf_data_transform_split.py       # Script to split a large csv file into smaller files for upsert into Salesforce - for an object.
+├── sf_data_load_all.py              # Script to upsert into Salesforce - for all objects.
+├── sf_data_load.py                  # Script to upsert into Salesforce - for an object.
+├── sf_data_delete_all.py            # Script to delete records inserted into Salesforce - for all object.
+├── sf_data_delete.py                # Script to delete records inserted into Salesforce - for an object.
+├── sf_utility.py                    
 └── README.md
 ```
 
@@ -79,7 +88,7 @@ python -m venv .venv
 source .venv/bin/activate   # On Windows: .venv\Scripts\activate
 
 # Install dependencies
-pip install -r requirements.txt
+python3 -m pip install simple_salesforce salesforce_bulk pandas tabulate openpyxl pymongo sqlalchemy pyodbc
 ```
 
 Provide Salesforce credentials through environment variables or a local `.env` file (excluded via `.gitignore`):
@@ -91,14 +100,13 @@ SF_SECURITY_TOKEN=
 SF_DOMAIN=login   # or "test" for sandbox
 ```
 
-Packages required:
-python3 -m pip install simple_salesforce salesforce_bulk pandas tabulate openpyxl pymongo sqlalchemy pyodbc
-
+# If staging of data in MSSQL is needed:
 Driver required on local machine:
 MSSQL ODBC Driver
 
 Create a top containing folder, the name of the folder should be the same as the organization name. 
 Create sub folders for intake, logs, outuput, and staging of files; e.g.: in, logs, out, stage
+Example: the organization is: causeway 
 
 ## Usage
 
