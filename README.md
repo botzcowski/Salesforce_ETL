@@ -100,13 +100,24 @@ SF_SECURITY_TOKEN=
 SF_DOMAIN=login   # or "test" for sandbox
 ```
 
-# If staging of data in MSSQL is needed:
+## If staging of data in MSSQL is needed:
+
 Driver required on local machine:
 MSSQL ODBC Driver
 
-Create a top containing folder, the name of the folder should be the same as the organization name. 
-Create sub folders for intake, logs, outuput, and staging of files; e.g.: in, logs, out, stage
-Example: the organization is: causeway 
+## Folder structure 
+
+Create a top containing folder, the name of the folder should be the same as the organization name, e.g.: causeway. 
+Create sub folders for intake, logs, outuput, and staging of files; e.g.: in, logs, out, stage. These subfolder names will then be provided to the scripts via input parameter values.
+
+## Config files 
+
+Salesforce related configurations, named as config_<organization>.json, example: config_causeway.json.
+max_day_range: the number of days back from the last extract run date to derive the lower-bound CDC date. 
+max_records_per_file: the number records to send to Salesforce for bulk API 2.0 operation (limit is 150 MB, and Salesforce will break into batches of 2,000).    
+transform_sf_system_fields: boolean, when true Salesforce object system fields are inserted with specified values, i.e.: Enable 'Create Audit Fields'  
+db: the name of the Mongo or MSSQL database name, leave blank when not inserting record into a staging database.
+target_objects: for each target object specify the source object and the related objects
 
 ## Usage
 
