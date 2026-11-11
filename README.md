@@ -91,6 +91,15 @@ SF_SECURITY_TOKEN=
 SF_DOMAIN=login   # or "test" for sandbox
 ```
 
+Packages required:
+python3 -m pip install simple_salesforce salesforce_bulk pandas tabulate openpyxl pymongo sqlalchemy pyodbc
+
+Driver required on local machine:
+MSSQL ODBC Driver
+
+Create a top containing folder, the name of the folder should be the same as the organization name. 
+Create sub folders for intake, logs, outuput, and staging of files; e.g.: in, logs, out, stage
+
 ## Usage
 
 Run each stage in order:
@@ -112,4 +121,4 @@ Contributions are welcome. Please open an issue or submit a pull request.
 
 ## License
 
-Specify your license here.
+GNU General Public License v3.0
