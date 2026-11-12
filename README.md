@@ -193,7 +193,7 @@ Create an External Client App, enable Client Credential Flow, generate Consumer 
 - domain: the my domain name up to "my", example: "causeway--testing.sandbox.my", this is a workaround for simple_salesforce's lack of support for custom domains.
 
 ## Usage
-- The sf_data_extract_all.py script looks for 2 files for each source object in the folder specified in the -objdir parameter
+- Extraction: the sf_data_extract_all.py script looks for 2 files for each source object in the folder specified in the -objdir parameter
     - file containing the last run date; file name = [source object api name]_last_run.txt, e.g.: account_last_run.txt. The datetime value stored in the file is in the UTC format, e.g.: 2025-12-23T05:27:15Z, and it's used as the lower-bound CDC date (SOQL filter on SystemModStamp) 
     - file containing the source object field api names to be extracted, delimited by comma or JSON string; file name = [source object api name].txt, e.g.: account.txt. When transforming a source object's data to a target object then the JSON string is configuration information to a field mapping file as in this example:
     ```json
@@ -206,8 +206,10 @@ Create an External Client App, enable Client Credential Flow, generate Consumer 
      }
     ``` 
 - Determine if you will need to work with related objects, i.e. you need to re-link the child/lookup relationship after completing the ETL work for the source or source-to-target object. If yes, then modify the config_[organization].json accordingly.
-- The sf_data_extract.py executes the extraction for each object and places the csv file into the folder named in the -datadir parameter.
-- Insert the extracted data into a database when there is a need to profile the data such as missing values or inconsistent value not specified in a pick list.  
+- For each object the sf_data_extract.py is called to executes the extraction using the Salesforce REST API, the results is formatted as csv files and placed into the folder named in the -datadir parameter.
+- Insert the extracted data into a database when there is a need to profile the data for quality such as missing values or values not defined in a pick list field.
+- Transformation: the sf_data_transform_all.py reads all files in the folder specified in the -stagedir parameter, for each file the sf_data_transform.py script is invoked. Field transformation logic/rule is defined in the field mapping in the column named by "transformation_column_name" in configuration.
+- Load: splitting of csv files by n number of record might be required to manage the number of nonconcurrent batch runs on Salesforce. For example, a csv file with 200,000 records will result in 20 batches. The sf_data_load_all.py script reads all csv files in the folder specified by the -stagedir parameter and invoke sf_data_load.py for each file.   
 
 ```bash
 python extract/<extract_script>.py
