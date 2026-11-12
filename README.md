@@ -42,8 +42,8 @@ Scripts that operate on the staged data to prepare it for loading.
 ### 3. Upsert to Salesforce
 Scripts that load the transformed data back into Salesforce.
 
-- Upsert records using an external ID or other unique key
-- Handle batching and API limits
+- Insert or update records using an external ID or record ID via Bulk API 2.0
+- Handle batching and API limits by splitting the CVS files into n number of records per file. 
 - Capture and report success and error results
 
 ## Repository Structure
@@ -105,7 +105,7 @@ Create sub folders for intake, logs, outuput, and staging of files; e.g.: in, lo
 ## Config files 
 
 Salesforce related configurations, named as config_[organization].json, example: config_causeway.json.
-- max_day_range: the number of days back from the last extract run date to derive the lower-bound CDC date. 
+- max_day_range: the number of days plus from the last extract run date to derive the lower-bound CDC date. 
 - max_records_per_file: the number records to send to Salesforce for bulk API 2.0 operation (limit is 150 MB, and Salesforce will break into batches of 2,000).    
 - transform_sf_system_fields: boolean, when true Salesforce object system fields are inserted with specified values, i.e.: Enable 'Create Audit Fields'  
 - db: the name of the Mongo or MSSQL database name, leave blank when not inserting record into a staging database.
@@ -194,7 +194,7 @@ Create an External Client App, enable Client Credential Flow, generate Consumer 
 
 ## Usage
 - The sf_data_extract_all.py script looks for 2 files for each source object in the folder specified in the -objdir parameter
-    - file containing the last run date; file name = [source object api name]_last_run.txt, e.g.: account_last_run.txt 
+    - file containing the last run date; file name = [source object api name]_last_run.txt, e.g.: account_last_run.txt. The datetime value stored in the file is in the UTC format, e.g.: 2025-12-23T05:27:15Z, and it's used as the lower-bound CDC date (SOQL filter on SystemModStamp) 
     - file containing the source object field api names to be extracted, delimited by comma or JSON string; file name = [source object api name].txt, e.g.: account.txt. When transforming a source object's data to a target object then the JSON string is configuration information to a field mapping file as in this example:
     ```json
      {
@@ -207,7 +207,7 @@ Create an External Client App, enable Client Credential Flow, generate Consumer 
     ``` 
 - Determine if you will need to work with related objects, i.e. you need to re-link the child/lookup relationship after completing the ETL work for the source or source-to-target object. If yes, then modify the config_[organization].json accordingly.
 - The sf_data_extract.py executes the extraction for each object and places the csv file into the folder named in the -datadir parameter.
-- Insert the extract data into a database when there is a need to profile the data such as missing values or inconsistent value not specified in a pick list.  
+- Insert the extracted data into a database when there is a need to profile the data such as missing values or inconsistent value not specified in a pick list.  
 
 ```bash
 python extract/<extract_script>.py
