@@ -211,10 +211,12 @@ Create an External Client App, enable Client Credential Flow, generate Consumer 
 - Transformation: the sf_data_transform_all.py reads all files in the folder specified in the -stagedir parameter, for each file the sf_data_transform.py script is invoked. Field transformation logic/rule is defined in the field mapping in the column named by "transformation_column_name" in configuration.
 - Load: splitting of csv files by n number of record might be required to manage the number of nonconcurrent batch runs on Salesforce. For example, a csv file with 200,000 records will result in 20 batches. The sf_data_load_all.py script reads all csv files in the folder specified by the -stagedir parameter and invoke sf_data_load.py for each file.   
 
+
 ```bash
-python extract/<extract_script>.py
-python transform/<transform_script>.py
-python load/<upsert_script>.py
+python3 sf_data_extract_all.py -org causeway -objdir causeway/ATP_master/in -datadir causeway/ATP_master/out -logdir causeway/logs -cdcfield createddate
+python3 sf_data_transform_all.py -org causeway -objdir causeway/ATP_master/in -datadir causeway/ATP_master/out -stagedir causeway/ATP_master/stage -logdir causeway/logs
+python3 sf_data_transform_split_all.py -org causeway -obj InsurancePolicy -getref false -datadir causeway/ATP_Master/out -stagedir causeway/ATP_Master/stage -logdir causeway/logs
+python3 sf_data_load_all.py -org causeway -mode upsert -stagedir causeway/ATP_master/stage -logdir causeway/logs
 ```
 
 ## Notes
